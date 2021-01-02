@@ -1,12 +1,11 @@
 import { Router, Request, Response } from 'express';
-import logger from 'src/logger';
-import { pgClient } from 'src/db';
+import logger from '../logger';
+import { DBHandler, Account } from '../db';
+import { wrap } from '@mikro-orm/core';
 
 const app: Router = Router();
 
 app.get('/', async (req: Request, res: Response) => {
-  await pgClient.connect();
-  await pgClient.disconnect();
   return res.json({ msg: 'Hello world' });
 });
 
@@ -18,8 +17,12 @@ app.get('/', async (req: Request, res: Response) => {
 app.post('/register', async (req: Request, res: Response) => {
   try {
     const { deviceToken, address } = req.body;
-    // TODO: insert into database
     logger.debug(`device token is: ${deviceToken}, address is: ${address}, ${address}`);
+    let account = await DBHandler.Account.findOne({ deviceToken: deviceToken, walletAddress: address });
+    if (! account) {
+      account = new Account(deviceToken, address);
+      await DBHandler.Account.persist(account).flush();
+    }
 
     return res.json({ status: 'success', msg: '' });
   } catch (error) {
@@ -40,7 +43,11 @@ app.post('/deregister', async (req: Request, res: Response) => {
   try {
     const { deviceToken, address } = req.body;
     logger.debug(`device token is: ${deviceToken}, address is: ${address}`);
-    // TODO: remove from database
+
+    const account = await DBHandler.Account.findOne({ deviceToken: deviceToken, walletAddress: address });
+    // @ts-ignore
+    await DBHandler.Account.removeAndFlush(account);
+
     return res.json({ status: 'success', msg: '' });
   } catch (error) {
     logger.error(`POST /deregister: unexcepected error occurs`);

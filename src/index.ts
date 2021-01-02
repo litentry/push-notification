@@ -2,9 +2,11 @@ import chalk from 'chalk';
 import cluster from 'cluster';
 import express from 'express';
 import bodyParser from 'body-parser';
+import { RequestContext } from '@mikro-orm/core';
 
-import logger from 'src/logger';
-import MyRouter from 'src/router';
+import logger from './logger';
+import MyRouter from './router';
+import { DBHandler } from './db';
 
 if (cluster.isMaster) {
   logger.debug(chalk.green(`Master process ${process.pid} is running ...`));
@@ -31,6 +33,7 @@ if (cluster.isMaster) {
 
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({ extended: false }));
+  app.use((req, res, next) => RequestContext.create(DBHandler.orm.em, next));
 
   app.use('/', MyRouter);
 

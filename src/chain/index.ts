@@ -4,8 +4,8 @@ import { Vec } from '@polkadot/types';
 import { TypeDef } from '@polkadot/types/create/types.d';
 import { EventRecord, Event, Phase } from '@polkadot/types/interfaces';
 
-import logger from 'src/logger';
-import { config, Config } from 'src/config';
+import logger from '../logger';
+import { config, Config } from '../config';
 /**
  * @name Chain
  * @description The blockchain class.
