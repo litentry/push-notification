@@ -25,7 +25,7 @@ export const DBHandler = {} as {
   orm: MikroORM;
   em: EntityManager;
   Account: EntityRepository<E.Account>;
-  createQueryBuilder: any;
+  connection: any;
 };
 export * from './entities';
 
@@ -44,6 +44,6 @@ export * from './entities';
   DBHandler.em = DBHandler.orm.em;
 
   DBHandler.Account = DBHandler.orm.em.getRepository(E['Account']);
-  // @ts-ignore
+
   DBHandler.connection = DBHandler.orm.em.getConnection();
 })();

@@ -1,19 +1,23 @@
-import { Entity, Property, Index } from '@mikro-orm/core';
+import { Entity, Property, Index, ArrayType } from '@mikro-orm/core';
 
 import { BaseEntity } from './BaseEntity';
 
 @Entity()
 @Index({ properties: ['deviceToken', 'walletAddress'] }) // compound index, with generated name
 export class Account extends BaseEntity {
-  @Property()
+  @Property({ nullable: false })
   deviceToken: string;
 
-  @Property()
+  @Property({ nullable: false })
   walletAddress: string;
 
-  constructor(deviceToken: string, walletAddress: string) {
+  @Property({ type: ArrayType, nullable: true })
+  events: string[];
+
+  constructor(deviceToken: string, walletAddress: string, events=[]) {
     super();
     this.deviceToken = deviceToken;
     this.walletAddress = walletAddress;
+    this.events = events;
   }
 }
