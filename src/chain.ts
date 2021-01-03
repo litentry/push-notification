@@ -1,11 +1,12 @@
-import _ from 'lodash';
 import { ApiPromise, WsProvider, Keyring } from '@polkadot/api';
 import { Vec } from '@polkadot/types';
 import { TypeDef } from '@polkadot/types/create/types.d';
 import { EventRecord, Event, Phase } from '@polkadot/types/interfaces';
 
-import logger from '../logger';
-import { config, Config } from '../config';
+import logger from './logger';
+import config from './config';
+import pushNotification from './notification';
+
 /**
  * @name Chain
  * @description The blockchain class.
@@ -28,12 +29,13 @@ class Chain {
   /**
    * @description configuration of the `Chain`
    */
-  private config: Config;
+  // private config: Config;
+  private config: any;
 
   /**
    * @description constructor of Chain
    */
-  constructor(config: Config) {
+  constructor(config: any) {
     this.config = config;
     this.wsProvider = new WsProvider(`${config.chain.protocol}://${config.chain.host}:${config.chain.port}`);
     this.keyring = new Keyring({ type: 'sr25519' });
@@ -71,38 +73,23 @@ class Chain {
 
         // Show what we are busy with
         const types: TypeDef[] = event.typeDef;
-        const section: string = event.section;
-        const method: string = event.method;
 
-        // if (event.section === 'identity' && event.method === 'JudgementRequested') {
-        //   logger.info(`\t${event.section}:${event.method}:: (phase=${phase.toString()})`);
-        //   logger.info(`\t\t${event.meta.documentation.toString()}`);
-
-        //   // Loop through each of the parameters, displaying the type and data
-        //   event.data.forEach((data, index) => {
-        //     logger.info(`\t\t\t${types[index].type}: ${data.toString()}`);
-        //     params[types[index].type] = data.toString();
-        //   });
-        //   // We only need to emit `handleRequestJudgement` event on our own registrar.
-        //   if (params['RegistrarIndex'] == this.config.account.regIndex) {
-        //     Event.emit('handleRequestJudgement', params['AccountId']);
-        //   }
-        // }
-        // // TODO: Should we handle cancelRequestJudgement ?
-        // if (event.section === 'identity' && event.method === 'JudgementUnrequested') {
-        //   logger.info(`\t${event.section}:${event.method}:: (phase=${phase.toString()})`);
-        //   logger.info(`\t\t${event.meta.documentation.toString()}`);
-
-        //   // Loop through each of the parameters, displaying the type and data
-        //   event.data.forEach((data, index) => {
-        //     logger.info(`\t\t\t${types[index].type}: ${data.toString()}`);
-        //     params[types[index].type] = data.toString();
-        //   });
-        //   // We only need to emit `handleRequestJudgement` event on our own registrar.
-        //   if (params['RegistrarIndex'] == this.config.account.regIndex) {
-        //     Event.emit('handleUnRequestJudgement', params['AccountId']);
-        //   }
-        // }
+        let params = {};
+        event.data.forEach((data, index) => {
+          logger.info(`\t\t\t${types[index].type}: ${data.toString()}`);
+          // @ts-ignore
+          params[types[index].type] = data.toString();
+        });
+        const message = {
+          topic: `${event.section}.${event.method}`,
+          data: params,
+          notification: {
+            title: `Received new ${event.section}.${event.method}`,
+            body: '',
+          },
+        };
+        // Push event notification to firebase messaging service.
+        pushNotification(message);
       });
     });
 
@@ -127,6 +114,15 @@ class Chain {
     logger.debug('[EventListenerRestart] Restarting event listener...');
     await this.eventListenerStop();
     await this.eventListenerStart();
+  }
+
+  /**
+   * @description Auto-restart event listener
+   */
+  async eventListenerAutoRestart() {
+    this.wsProvider.on('disconnected', async () => {
+      await this.eventListenerRestart();
+    });
   }
 }
 

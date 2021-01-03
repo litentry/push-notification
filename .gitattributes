@@ -1,5 +1,6 @@
 .gitattributes !filter !diff
 .gitignore !filter !diff
 .git/* !filter !diff
-push-notification-account.json filter=git-crypt diff=git-crypt
+push-notification-service-account.json filter=git-crypt diff=git-crypt
 src/config/index.ts filter=git-crypt diff=git-crypt
+src/config/db.ts filter=git-crypt diff=git-crypt

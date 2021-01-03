@@ -14,7 +14,7 @@ export class Account extends BaseEntity {
   @Property({ type: ArrayType, nullable: true })
   events: string[];
 
-  constructor(deviceToken: string, walletAddress: string, events=[]) {
+  constructor(deviceToken: string, walletAddress: string, events = []) {
     super();
     this.deviceToken = deviceToken;
     this.walletAddress = walletAddress;

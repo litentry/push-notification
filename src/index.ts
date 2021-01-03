@@ -5,8 +5,10 @@ import bodyParser from 'body-parser';
 import { RequestContext } from '@mikro-orm/core';
 
 import logger from './logger';
-import MyRouter from './router';
+import config from './config';
+import chain from './chain';
 import { DBHandler } from './db';
+import MyRouter from './router';
 
 if (cluster.isMaster) {
   logger.debug(chalk.green(`Master process ${process.pid} is running ...`));
@@ -38,85 +40,15 @@ if (cluster.isMaster) {
   app.use('/', MyRouter);
 
   /* Listen on port */
-  const config = { port: 3000 };
-  app.listen(config.port);
+  app.listen(config.http.port);
   /* Log some basic information */
-  logger.info(chalk.green(`Process ${process.pid} is listening on: ${config.port}`));
+  logger.info(chalk.green(`Process ${process.pid} is listening on: ${config.http.port}`));
   logger.info(chalk.green(`NODE_ENV: ${process.env.NODE_ENV}`));
+
+  (async () => {
+    await chain.eventListenerAutoRestart();
+  })();
 } else {
   // @ts-ignore
   throw new Error(`Unknown worker type ${cluster.worker.process.env.type}`);
 }
-
-// // admin.initializeApp({
-// //     credential: admin.credential.cert(serviceAccount)
-// // });
-
-// // const topicName = 'industry-tech';
-
-// // var message = {
-// //     notification: {
-// //         title: '`$FooCorp` up 1.43% on the day',
-// //         body: 'FooCorp gained 11.80 points to close at 835.67, up 1.43% on the day.'
-// //     },
-// //     // android: {
-// //     //     notification: {
-// //     //         icon: 'stock_ticker_update',
-// //     //         color: '#7e55c3'
-// //     //     }
-// //     // },
-// //     topic: topicName,
-// // };
-
-// // admin.messaging().send(message)
-// //     .then((response) => {
-// //         // Response is a message ID string.
-// //         console.log('Successfully sent message:', response);
-// //     })
-// //     .catch((error) => {
-// //         console.log('Error sending message:', error);
-// //     });
-
-// const mq = require('mq');
-// const _ = require('lodash');
-
-// // const redis = require("redis");
-// // const client = redis.createClient();
-
-// // mq.A();
-// // client.on("error", function(error) {
-// //   console.error(error);
-// // });
-
-// // client.set("key", "value", redis.print);
-// // client.get("key", redis.print);
-
-// // const admin = require("firebase-admin");
-// // const serviceAccount = require("./push-notification-account.json");
-
-// // admin.initializeApp({
-// //     credential: admin.credential.cert(serviceAccount)
-// // });
-
-// // const deviceToken = 'fXvKVFu6RraIvDqYtTc2-a:APA91bGlo_OMgGHcNPt00vVb5Ndkb2N7_zWMpVT7Q0cTqRZ_cX23CB7Mi_Y0Vyloh3z22w-iVtTJZnLiWdavvY41xJWUlWxXo9ZclK3u_jq9Gf7iE2gl4qzVAllAJDHstG1_Bc3P7E_X';
-
-// // const message = {
-// //     data: {
-// //         score: '850',
-// //         time: '2:45'
-// //     },
-// //     notification: {
-// //         title: '$FooCorp up 1.43% on the day',
-// //         body: '$FooCorp gained 11.80 points to close at 835.67, up 1.43% on the day.'
-// //     },
-// //     token: deviceToken
-// // };
-
-// // admin.messaging().send(message)
-// //     .then((response) => {
-// //         // Response is a message ID string.
-// //         console.log('Successfully sent message:', response);
-// //     })
-// //     .catch((error) => {
-// //         console.log('Error sending message:', error);
-// //     });

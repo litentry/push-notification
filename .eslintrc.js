@@ -1,10 +1,7 @@
 module.exports = {
   root: true,
   parser: '@typescript-eslint/parser',
-  plugins: ['@typescript-eslint', 'module-resolver'],
-  rules: {
-    'module-resolver/use-alias': 2,
-  },
+  plugins: ['@typescript-eslint'],
   extends: [
     // Uses the recommended rules from the @typescript-eslint/eslint-plugin
     // "plugin:@typescript-eslint/recommended",

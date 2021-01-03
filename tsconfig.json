@@ -12,6 +12,7 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "strictPropertyInitialization": false,
+    "resolveJsonModule": true,
     "baseUrl": "./src",
     "paths": {
       "router/*": ["./router/*"],
