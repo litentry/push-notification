@@ -33,13 +33,18 @@ class Chain {
   private config: any;
 
   /**
+   * @description interested events of this chain
+   */
+  private interestedEvents: string[];
+
+  /**
    * @description constructor of Chain
    */
   constructor(config: any) {
     this.config = config;
     this.wsProvider = new WsProvider(`${config.chain.protocol}://${config.chain.host}:${config.chain.port}`);
     this.keyring = new Keyring({ type: 'sr25519' });
-
+    this.interestedEvents = config.chain.events || [];
     this.unsubscribeEventListener = null;
   }
 
@@ -71,29 +76,54 @@ class Chain {
         const phase: Phase = record.phase;
         logger.debug(`Received event from chain: [${event.section}.${event.method}]`);
 
-        // Show what we are busy with
-        const types: TypeDef[] = event.typeDef;
+        for (let interestedEvent of this.interestedEvents) {
+          const [interestedSection, interestedMethod] = interestedEvent.split('.');
 
-        let params = {};
-        event.data.forEach((data, index) => {
-          logger.info(`\t\t\t${types[index].type}: ${data.toString()}`);
-          // @ts-ignore
-          params[types[index].type] = data.toString();
-        });
-        const message = {
-          topic: `${event.section}.${event.method}`,
-          data: params,
-          notification: {
-            title: `Received new ${event.section}.${event.method}`,
-            body: '',
-          },
-        };
-        // Push event notification to firebase messaging service.
-        pushNotification(message);
+          if (interestedSection === '*') {
+            logger.debug(`Process interestedSection: ${interestedSection}`);
+            this.handleEvent(event);
+            break;
+          } else if (interestedSection === event.section && interestedMethod === '*') {
+            logger.debug(`Process interestedSection: ${interestedSection}.${interestedMethod}`);
+            this.handleEvent(event);
+            break;
+          } else if (interestedSection === event.section && interestedMethod === event.method) {
+            logger.debug(`Process interestedSection: ${interestedSection}.${interestedMethod}`);
+            this.handleEvent(event);
+            break;
+          } else {
+            logger.debug(`Not interested event: ${interestedSection}.${interestedMethod}`);
+          }
+        }
       });
     });
 
     return this.unsubscribeEventListener;
+  }
+  /**
+   * @description Handle interested event
+   * @param {Event} event
+   */
+  handleEvent(event: Event) {
+    // Show what we are busy with
+    const types: TypeDef[] = event.typeDef;
+
+    let params = {};
+    event.data.forEach((data, index) => {
+      logger.info(`\t\t\t${types[index].type}: ${data.toString()}`);
+      // @ts-ignore
+      params[types[index].type] = data.toString();
+    });
+    const message = {
+      topic: `${event.section}.${event.method}`,
+      data: params,
+      notification: {
+        title: `Received new ${event.section}.${event.method}`,
+        body: '',
+      },
+    };
+    // Push event notification to firebase messaging service.
+    pushNotification(message);
   }
 
   /**
@@ -119,7 +149,7 @@ class Chain {
   /**
    * @description Auto-restart event listener
    */
-  async eventListenerAutoRestart() {
+  async eventListenerAutoRestart(interestedEvents: string[] = []) {
     this.wsProvider.on('disconnected', async () => {
       await this.eventListenerRestart();
     });
