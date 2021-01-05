@@ -5,10 +5,14 @@
   "scripts": {
     "compile": "tsc",
     "lint": "eslint --fix src --ext .js,.ts",
-    "start": "nodemon dist/index.js",
+    "app": "nodemon dist/index.js",
+    "start": "pm2 start dist/index.js",
+    "stop": "pm2 stop dist/index.js",
     "clean": "rm -rf dist/*",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "yarn compile && yarn start"
+    "start:dev": "yarn compile && yarn app",
+    "start:staging": "yarn compile && yarn start",
+    "stop:staging": "yarn compile && yarn stop"
   },
   "author": "",
   "license": "ISC",

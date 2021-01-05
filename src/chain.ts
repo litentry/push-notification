@@ -38,6 +38,11 @@ class Chain {
   private interestedEvents: string[];
 
   /**
+   * @description the flag to indicate first connecting attemp
+   */
+  private firstConnected: boolean;
+
+  /**
    * @description constructor of Chain
    */
   constructor(config: any) {
@@ -46,6 +51,7 @@ class Chain {
     this.keyring = new Keyring({ type: 'sr25519' });
     this.interestedEvents = config.chain.events || [];
     this.unsubscribeEventListener = null;
+    this.firstConnected = false;
   }
 
   /**
@@ -150,9 +156,14 @@ class Chain {
    * @description Auto-restart event listener
    */
   async eventListenerAutoRestart(interestedEvents: string[] = []) {
-    this.wsProvider.on('disconnected', async () => {
-      await this.eventListenerRestart();
-    });
+    if (this.firstConnected) {
+      this.firstConnected = true;
+      await this.eventListenerStart();
+    } else {
+      this.wsProvider.on('disconnected', async () => {
+        await this.eventListenerRestart();
+      });
+    }
   }
 }
 
