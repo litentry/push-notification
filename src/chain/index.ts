@@ -3,9 +3,9 @@ import { Vec } from '@polkadot/types';
 import { TypeDef } from '@polkadot/types/create/types.d';
 import { EventRecord, Event, Phase } from '@polkadot/types/interfaces';
 
-import logger from './logger';
-import config from './config';
-import pushNotification from './notification';
+import logger from '../logger';
+import pushNotification from '../notification';
+import config, { ChainConfig } from './config';
 
 /**
  * @name Chain
@@ -26,16 +26,11 @@ class Chain {
   private api: ApiPromise;
 
   private unsubscribeEventListener: null | Promise<() => void>;
-  /**
-   * @description configuration of the `Chain`
-   */
-  // private config: Config;
-  private config: any;
 
   /**
    * @description interested events of this chain
    */
-  private interestedEvents: string[];
+  private interestedEvents: ReadonlyArray<string>;
 
   /**
    * @description the flag to indicate first connecting attemp
@@ -45,20 +40,28 @@ class Chain {
   /**
    * @description constructor of Chain
    */
-  constructor(config: any) {
-    this.config = config;
-    this.wsProvider = new WsProvider(`${config.chain.protocol}://${config.chain.host}:${config.chain.port}`);
+  constructor(config: ChainConfig) {
+    this.wsProvider = new WsProvider(config.ws);
+    this.interestedEvents = config.events;
     this.keyring = new Keyring({ type: 'sr25519' });
-    this.interestedEvents = config.chain.events || [];
     this.unsubscribeEventListener = null;
-    this.firstConnected = false;
+    this.firstConnected = true;
   }
 
   /**
-   * @description Connect to a configured block chain, such as `polkadot`, `westend` or `localchain`.
+   * @description Connect to a configured block chain, such as `polkadot`, `kusama` or `localchain`.
    */
   async connect() {
     this.api = await ApiPromise.create({ provider: this.wsProvider });
+
+    const [chain, nodeName, nodeVersion] = await Promise.all([
+      this.api.rpc.system.chain(),
+      this.api.rpc.system.name(),
+      this.api.rpc.system.version(),
+    ]);
+
+    logger.info(`You are connected to chain ${chain} using ${nodeName} v${nodeVersion}`);
+
     return this.api;
   }
 
@@ -68,10 +71,12 @@ class Chain {
   async eventListenerStart() {
     if (this.unsubscribeEventListener) {
       logger.debug('[EventListenerStart] Event listener is running now...');
+
       return this.unsubscribeEventListener;
     }
 
     logger.debug('[EventListenerStart] Starting event listener...');
+
     await this.connect();
 
     this.unsubscribeEventListener = this.api.query.system.events((events: Vec<EventRecord>) => {
@@ -87,15 +92,15 @@ class Chain {
 
           if (interestedSection === '*') {
             logger.debug(`Process interestedSection: ${interestedSection}`);
-            this.handleEvent(event);
+            // this.handleEvent(event);
             break;
           } else if (interestedSection === event.section && interestedMethod === '*') {
             logger.debug(`Process interestedSection: ${interestedSection}.${interestedMethod}`);
-            this.handleEvent(event);
+            // this.handleEvent(event);
             break;
           } else if (interestedSection === event.section && interestedMethod === event.method) {
             logger.debug(`Process interestedSection: ${interestedSection}.${interestedMethod}`);
-            this.handleEvent(event);
+            // this.handleEvent(event);
             break;
           } else {
             logger.debug(`Not interested event: ${interestedSection}.${interestedMethod}`);
@@ -155,18 +160,20 @@ class Chain {
   /**
    * @description Auto-restart event listener
    */
-  async eventListenerAutoRestart(interestedEvents: string[] = []) {
-    if (this.firstConnected) {
-      this.firstConnected = true;
-      await this.eventListenerStart();
-    } else {
-      this.wsProvider.on('disconnected', async () => {
-        await this.eventListenerRestart();
-      });
-    }
+  async eventListenerAutoRestart() {
+    await this.eventListenerStart();
+    // if (this.firstConnected) {
+    //   this.firstConnected = true;
+    //   await this.eventListenerStart();
+    // } else {
+    //   this.wsProvider.on('disconnected', async () => {
+    //     await this.eventListenerRestart();
+    //   });
+    // }
   }
 }
 
-const chain = new Chain(config);
+// @ts-ignore
+const chain = new Chain(config[process.env.CHAIN_NETWORK]);
 
 export default chain;
