@@ -1,16 +1,16 @@
 const kusamaNetwork = {
   ws: 'wss://kusama.api.onfinality.io/public-ws',
-  events: ['*'],
+  events: [],
 } as const;
 
 const polkadotNetwork = {
   ws: 'wss://rpc.polkadot.io',
-  events: ['*'],
+  events: [],
 } as const;
 
 const litentryNetwork = {
   ws: 'wss://3.0.201.137',
-  events: ['*'],
+  events: [],
 } as const;
 
 export type ChainConfig = typeof kusamaNetwork | typeof polkadotNetwork | typeof litentryNetwork;
