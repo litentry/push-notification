@@ -92,15 +92,15 @@ class Chain {
 
           if (interestedSection === '*') {
             logger.debug(`Process interestedSection: ${interestedSection}`);
-            // this.handleEvent(event);
+            this.handleEvent(event);
             break;
           } else if (interestedSection === event.section && interestedMethod === '*') {
             logger.debug(`Process interestedSection: ${interestedSection}.${interestedMethod}`);
-            // this.handleEvent(event);
+            this.handleEvent(event);
             break;
           } else if (interestedSection === event.section && interestedMethod === event.method) {
             logger.debug(`Process interestedSection: ${interestedSection}.${interestedMethod}`);
-            // this.handleEvent(event);
+            this.handleEvent(event);
             break;
           } else {
             logger.debug(`Not interested event: ${interestedSection}.${interestedMethod}`);
@@ -162,6 +162,7 @@ class Chain {
    */
   async eventListenerAutoRestart() {
     await this.eventListenerStart();
+    // TODO: check if we really need this, the api instance handles reconnections
     // if (this.firstConnected) {
     //   this.firstConnected = true;
     //   await this.eventListenerStart();
