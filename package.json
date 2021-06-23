@@ -28,7 +28,7 @@
     "chalk": "^2.4.2",
     "cluster": "^0.7.7",
     "express": "^4.17.1",
-    "firebase-admin": "^9.4.2",
+    "firebase-admin": "^9.9.0",
     "lodash": "^4.17.20",
     "redis": "^3.0.2",
     "winston": "^3.3.3",
