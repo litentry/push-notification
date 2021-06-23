@@ -1,17 +1,11 @@
 ## Setup
 
-1. Create database named PushNotification
-2. Setup database configuration in file **./src/config/db.ts**
-3. Run command `./node_modules/.bin/mikro-orm schema:create -r` if you use relationship database, e.g. **postgresql**, **mysql**, **sqlite**. If you use NoSQL such as **mongodb**, it's no need to create schema beforehand.
+- Install git-crypt. See git-crypt for details, Mac users can simply run `brew install git-crypt`.
+- Install packages: `yarn`
+- Before running the app, you need to decrypt the config files. For this you will need the key on your machine, then run: `git-crypt unlock /path/to/key`.
 
 ## Start the services
-```
-yarn compile
-yarn app
-```
+run: `NODE_ENV=development CHAIN_NETWORK=litentry_test yarn start:dev`
 
-or
 
-```
-yarn start:dev
-```
+Current supported networks: polkadot, kusama, litentry_test.
