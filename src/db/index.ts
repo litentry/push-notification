@@ -1,14 +1,8 @@
-import {
-  EntityManager,
-  EntityRepository,
-  MikroORM,
-  UnderscoreNamingStrategy,
-  ConnectionOptions,
-} from '@mikro-orm/core';
+import { EntityManager, EntityRepository, MikroORM, UnderscoreNamingStrategy } from '@mikro-orm/core';
 
 import * as E from './entities';
 import logger from '../logger';
-import config from '../config';
+// import config from '../config';
 
 /**
  * @description Database handler
@@ -32,7 +26,7 @@ export * from './entities';
     entitiesTs: [`./src/db/entities/*.ts`],
     forceUtcTimezone: true,
     logger: (message: string) => logger.info(message),
-    ...config.db,
+    // ...config.db,
   });
 
   DBHandler.em = DBHandler.orm.em;

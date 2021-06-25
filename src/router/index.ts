@@ -3,7 +3,7 @@ import { Router, Request, Response } from 'express';
 import { wrap } from '@mikro-orm/core';
 
 import logger from '../logger';
-import { DBHandler, Account } from '../db';
+// import { DBHandler, Account } from '../db';
 
 const app: Router = Router();
 
@@ -23,13 +23,14 @@ app.post('/register', async (req: Request, res: Response) => {
     if (_.isEmpty(deviceToken) || _.isEmpty(walletAddress)) {
       throw new Error(`deviceToken or walletAddress is missing`);
     }
-    let account = await DBHandler.Account.findOne({ deviceToken: deviceToken, walletAddress: walletAddress });
-    if (!account) {
-      account = new Account(deviceToken, walletAddress, []);
-      await DBHandler.Account.persist(account).flush();
-    }
+    // let account = await DBHandler.Account.findOne({ deviceToken: deviceToken, walletAddress: walletAddress });
+    // if (!account) {
+    //   account = new Account(deviceToken, walletAddress, []);
+    //   await DBHandler.Account.persist(account).flush();
+    // }
 
-    return res.json({ status: 'success', msg: '', account: account });
+    // return res.json({ status: 'success', msg: '', account: account });
+    return res.json({ status: 'success' });
   } catch (error) {
     logger.error(`POST /register: unexcepected error occurs`);
     console.trace(error);
@@ -52,11 +53,11 @@ app.post('/deregister', async (req: Request, res: Response) => {
       throw new Error(`deviceToken or walletAddress is missing`);
     }
 
-    const account = (await DBHandler.Account.findOne({
-      deviceToken: deviceToken,
-      walletAddress: walletAddress,
-    })) as Account;
-    await DBHandler.Account.removeAndFlush(account);
+    // const account = (await DBHandler.Account.findOne({
+    //   deviceToken: deviceToken,
+    //   walletAddress: walletAddress,
+    // })) as Account;
+    // await DBHandler.Account.removeAndFlush(account);
     res.status(204);
     return res.json({ status: 'success', msg: '' });
   } catch (error) {
@@ -81,14 +82,15 @@ app.post('/events/config', async (req: Request, res: Response) => {
       return res.json({ status: 'success', msg: 'No events provided' });
     }
 
-    let account = (await DBHandler.Account.findOne({
-      deviceToken: deviceToken,
-      walletAddress: walletAddress,
-    })) as Account;
-    wrap(account).assign({ events: events });
-    await DBHandler.Account.persist(account).flush();
+    // let account = (await DBHandler.Account.findOne({
+    //   deviceToken: deviceToken,
+    //   walletAddress: walletAddress,
+    // })) as Account;
+    // wrap(account).assign({ events: events });
+    // await DBHandler.Account.persist(account).flush();
 
-    return res.json({ status: 'success', msg: '', account: account });
+    // return res.json({ status: 'success', msg: '', account: account });
+    return res.json({ status: 'success', msg: '' });
   } catch (error) {
     logger.error(`POST /events/config: unexcepected error occurs`);
     console.trace(error);
@@ -111,23 +113,24 @@ app.patch('/events/config', async (req: Request, res: Response) => {
       return res.json({ status: 'success', msg: 'No events provided' });
     }
 
-    let account = (await DBHandler.Account.findOne({
-      deviceToken: deviceToken,
-      walletAddress: walletAddress,
-    })) as Account;
+    // let account = (await DBHandler.Account.findOne({
+    //   deviceToken: deviceToken,
+    //   walletAddress: walletAddress,
+    // })) as Account;
     // Update events
-    let newEvents = new Set(account.events);
+    // let newEvents = new Set(account.events);
 
-    for (let e of events) {
-      if (!newEvents.has(e)) {
-        newEvents.add(e);
-      }
-    }
-
-    wrap(account).assign({ events: [...newEvents] });
-    await DBHandler.Account.persist(account).flush();
-
-    return res.json({ status: 'success', msg: '', account: account });
+    //     for (let e of events) {
+    //       if (!newEvents.has(e)) {
+    //         newEvents.add(e);
+    //       }
+    //     }
+    //
+    //     wrap(account).assign({ events: [...newEvents] });
+    //     await DBHandler.Account.persist(account).flush();
+    //
+    //     return res.json({ status: 'success', msg: '', account: account });
+    return res.json({ status: 'success', msg: '' });
   } catch (error) {
     logger.error(`PATCH /events/config: unexcepected error occurs`);
     console.trace(error);
@@ -150,22 +153,23 @@ app.delete('/events/config', async (req: Request, res: Response) => {
       return res.json({ status: 'success', msg: 'No events provided' });
     }
 
-    let account = (await DBHandler.Account.findOne({
-      deviceToken: deviceToken,
-      walletAddress: walletAddress,
-    })) as Account;
-    let newEvents = new Set(account.events);
+    //     let account = (await DBHandler.Account.findOne({
+    //       deviceToken: deviceToken,
+    //       walletAddress: walletAddress,
+    //     })) as Account;
+    //     let newEvents = new Set(account.events);
+    //
+    //     for (let e of events) {
+    //       if (newEvents.has(e)) {
+    //         newEvents.delete(e);
+    //       }
+    //     }
+    //
+    //     wrap(account).assign({ events: [...newEvents] });
+    //     await DBHandler.Account.persist(account).flush();
 
-    for (let e of events) {
-      if (newEvents.has(e)) {
-        newEvents.delete(e);
-      }
-    }
-
-    wrap(account).assign({ events: [...newEvents] });
-    await DBHandler.Account.persist(account).flush();
-
-    return res.json({ status: 'success', msg: '', account: account });
+    // return res.json({ status: 'success', msg: '', account: account });
+    return res.json({ status: 'success', msg: '' });
   } catch (error) {
     logger.error(`DELETE /events/config: unexcepected error occurs`);
     console.trace(error);

@@ -1,14 +1,14 @@
 import chalk from 'chalk';
 import cluster from 'cluster';
-import express from 'express';
-import bodyParser from 'body-parser';
-import { RequestContext } from '@mikro-orm/core';
+// import express from 'express';
+// import { RequestContext } from '@mikro-orm/core';
+// import bodyParser from 'body-parser';
 
 import logger from './logger';
-import config from './config';
+// import config from './config';
 import chain from './chain';
-import { DBHandler } from './db';
-import MyRouter from './router';
+// import { DBHandler } from './db';
+// import MyRouter from './router';
 
 if (cluster.isMaster) {
   logger.debug(chalk.green(`Master process ${process.pid} is running ...`));
@@ -31,22 +31,22 @@ if (cluster.isMaster) {
   });
   // @ts-ignore
 } else if (cluster.worker.process.env.type == 'web_server_process') {
-  const app = express();
-
-  app.use(bodyParser.json());
-  app.use(bodyParser.urlencoded({ extended: false }));
-  app.use((req, res, next) => RequestContext.create(DBHandler.orm.em, next));
-
-  app.use('/', MyRouter);
-
-  /* Listen on port */
-  app.listen(config.http.port);
-  /* Log some basic information */
-  logger.info(chalk.green(`Process ${process.pid} is listening on: ${config.http.port}`));
-  logger.info(chalk.green(`NODE_ENV: ${process.env.NODE_ENV}`));
+  //   const app = express();
+  //
+  //   app.use(bodyParser.json());
+  //   app.use(bodyParser.urlencoded({ extended: false }));
+  //   // app.use((req, res, next) => RequestContext.create(DBHandler.orm.em, next));
+  //
+  //   app.use('/', MyRouter);
+  //
+  //   /* Listen on port */
+  //   app.listen(config.http.port);
+  //   /* Log some basic information */
+  //   logger.info(chalk.green(`Process ${process.pid} is listening on: ${config.http.port}`));
+  //   logger.info(chalk.green(`NODE_ENV: ${process.env.NODE_ENV}`));
 
   (async () => {
-    await chain.eventListenerAutoRestart();
+    await chain.eventListenerAutoRestart().catch(console.error);
   })();
 } else {
   // @ts-ignore
