@@ -1,11 +1,9 @@
-import { ApiPromise, WsProvider, Keyring } from '@polkadot/api';
-import { Vec } from '@polkadot/types';
-import { TypeDef } from '@polkadot/types/create/types.d';
-import { EventRecord, Event, Phase } from '@polkadot/types/interfaces';
-
-import logger from '../logger';
-import pushNotification from '../notification';
-import config, { ChainConfig } from './config';
+import { ApiPromise, WsProvider, Keyring } from "@polkadot/api";
+import { Vec } from "@polkadot/types";
+import { EventRecord } from "@polkadot/types/interfaces";
+import logger from "../logger";
+import pushNotification from "../notification";
+import config, { ChainConfig, InterestedEvent } from "./config";
 
 /**
  * @name Chain
@@ -30,7 +28,7 @@ class Chain {
   /**
    * @description interested events of this chain
    */
-  private interestedEvents: ReadonlyArray<string>;
+  private interestedEvents: ReadonlyArray<InterestedEvent>;
 
   /**
    * @description the flag to indicate first connecting attemp
@@ -43,7 +41,7 @@ class Chain {
   constructor(config: ChainConfig) {
     this.wsProvider = new WsProvider(config.ws);
     this.interestedEvents = config.events;
-    this.keyring = new Keyring({ type: 'sr25519' });
+    this.keyring = new Keyring({ type: "sr25519" });
     this.unsubscribeEventListener = null;
     this.firstConnected = true;
   }
@@ -57,7 +55,7 @@ class Chain {
     const [chain, nodeName, nodeVersion] = await Promise.all([
       this.api.rpc.system.chain(),
       this.api.rpc.system.name(),
-      this.api.rpc.system.version(),
+      this.api.rpc.system.version()
     ]);
 
     logger.info(`You are connected to chain ${chain} using ${nodeName} v${nodeVersion}`);
@@ -70,40 +68,42 @@ class Chain {
    */
   async eventListenerStart() {
     if (this.unsubscribeEventListener) {
-      logger.debug('[EventListenerStart] Event listener is running now...');
+      logger.debug("[EventListenerStart] Event listener is running now...");
 
       return this.unsubscribeEventListener;
     }
 
-    logger.debug('[EventListenerStart] Starting event listener...');
+    logger.debug("[EventListenerStart] Starting event listener...");
 
     await this.connect();
 
+    logger.debug(`SUBSCRIBING TO EVENTS`);
     this.unsubscribeEventListener = this.api.query.system.events((events: Vec<EventRecord>) => {
+      logger.debug(`Received ${events.length} events:`);
       // Loop through the Vec<EventRecord>
       events.forEach((record: EventRecord) => {
         // Extract the phase, event and the event types
-        const event: Event = record.event;
-        const phase: Phase = record.phase;
+        const { event } = record;
+
         logger.debug(`Received event from chain: [${event.section}.${event.method}]`);
 
         for (let interestedEvent of this.interestedEvents) {
-          const [interestedSection, interestedMethod] = interestedEvent.split('.');
+          const [interestedSection, interestedMethod] = interestedEvent.pattern.split(".");
 
-          if (interestedSection === '*') {
+          if (interestedSection === "*") {
             logger.debug(`Process interestedSection: ${interestedSection}`);
-            this.handleEvent(event);
+            pushNotification(interestedEvent.getPushData(event));
             break;
-          } else if (interestedSection === event.section && interestedMethod === '*') {
+          } else if (interestedSection === event.section && interestedMethod === "*") {
             logger.debug(`Process interestedSection: ${interestedSection}.${interestedMethod}`);
-            this.handleEvent(event);
+            pushNotification(interestedEvent.getPushData(event));
             break;
           } else if (interestedSection === event.section && interestedMethod === event.method) {
             logger.debug(`Process interestedSection: ${interestedSection}.${interestedMethod}`);
-            this.handleEvent(event);
+            pushNotification(interestedEvent.getPushData(event));
             break;
           } else {
-            logger.debug(`Not interested event: ${interestedSection}.${interestedMethod}`);
+            logger.debug(`Not interested event: ${event.section}.${event.method}`);
           }
         }
       });
@@ -111,37 +111,12 @@ class Chain {
 
     return this.unsubscribeEventListener;
   }
-  /**
-   * @description Handle interested event
-   * @param {Event} event
-   */
-  handleEvent(event: Event) {
-    // Show what we are busy with
-    const types: TypeDef[] = event.typeDef;
-
-    let params = {};
-    event.data.forEach((data, index) => {
-      logger.info(`\t\t\t${types[index].type}: ${data.toString()}`);
-      // @ts-ignore
-      params[types[index].type] = data.toString();
-    });
-    const message = {
-      topic: `${event.section}.${event.method}`,
-      data: params,
-      notification: {
-        title: `Received new ${event.section}.${event.method}`,
-        body: '',
-      },
-    };
-    // Push event notification to firebase messaging service.
-    pushNotification(message);
-  }
 
   /**
    * @description Stop a event listener
    */
   async eventListenerStop() {
-    logger.debug('[EventListenerStop] Stopping event listener...');
+    logger.debug("[EventListenerStop] Stopping event listener...");
     if (this.unsubscribeEventListener) {
       (await this.unsubscribeEventListener)();
     }
@@ -152,7 +127,7 @@ class Chain {
    * @description Restart event listener
    */
   async eventListenerRestart() {
-    logger.debug('[EventListenerRestart] Restarting event listener...');
+    logger.debug("[EventListenerRestart] Restarting event listener...");
     await this.eventListenerStop();
     await this.eventListenerStart();
   }
