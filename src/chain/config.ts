@@ -28,6 +28,18 @@ const litentryNetwork = {
         }
       };
     }
+  }, {
+    pattern: "tips.newTip",
+    getPushData() {
+      return {
+        topic: "tips.newTip",
+        data: { deeplink: "litentry://tips" },
+        notification: {
+          title: "Tip Suggestion",
+          body: "A new tip has been suggested, check it out!"
+        }
+      };
+    }
   }] as InterestedEvent[]
 } as const;
 
