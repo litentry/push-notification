@@ -40,6 +40,18 @@ const litentryNetwork = {
         }
       };
     }
+  }, {
+    pattern: "democracy.Started",
+    getPushData() {
+      return {
+        topic: "democracy.Started",
+        data: { deeplink: "litentry://referenda" },
+        notification: {
+          title: "Time to vote!",
+          body: "A New Referendum has begun, check out the proposal!"
+        }
+      };
+    }
   }] as InterestedEvent[]
 } as const;
 
