@@ -21,7 +21,7 @@ const litentryNetwork = {
     getPushData() {
       return {
         topic: "treasury.Proposed",
-        data: { deeplink: "litentry://treasury" },
+        data: { deeplink: "litentry://api/litentry_test/treasury" },
         notification: {
           title: `New Treasury Proposal`,
           body: "A new treasury proposal has been submitted, check it out!"
