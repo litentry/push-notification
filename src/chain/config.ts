@@ -3,17 +3,22 @@ import { Event } from "@polkadot/types/interfaces";
 
 export type InterestedEvent = { pattern: string, getPushData: (event: Event) => admin.messaging.TopicMessage };
 
-const kusamaNetwork = {
+export type ChainConfig = {
+  ws: string;
+  events: readonly InterestedEvent[]
+}
+
+const kusamaNetwork: ChainConfig = {
   ws: "wss://kusama.api.onfinality.io/public-ws",
-  events: [] as InterestedEvent []
-} as const;
+  events: [],
+} as const
 
-const polkadotNetwork = {
+const polkadotNetwork: ChainConfig = {
   ws: "wss://rpc.polkadot.io",
-  events: [] as InterestedEvent[]
-} as const;
+  events: [],
+} as const
 
-const litentryNetwork = {
+const litentryNetwork: ChainConfig = {
   // ws: 'wss://3.0.201.137',
   ws: "wss://staging.registrar.litentry.io",
   events: [{
@@ -28,34 +33,9 @@ const litentryNetwork = {
         }
       };
     }
-  }, {
-    pattern: "tips.newTip",
-    getPushData() {
-      return {
-        topic: "tips.newTip",
-        data: { deeplink: "litentry://tips" },
-        notification: {
-          title: "Tip Suggestion",
-          body: "A new tip has been suggested, check it out!"
-        }
-      };
-    }
-  }, {
-    pattern: "democracy.Started",
-    getPushData() {
-      return {
-        topic: "democracy.Started",
-        data: { deeplink: "litentry://referenda" },
-        notification: {
-          title: "Time to vote!",
-          body: "A New Referendum has begun, check out the proposal!"
-        }
-      };
-    }
-  }] as InterestedEvent[]
-} as const;
+  }]
+}
 
-export type ChainConfig = typeof kusamaNetwork | typeof polkadotNetwork | typeof litentryNetwork;
 
 export default {
   kusama: kusamaNetwork,
