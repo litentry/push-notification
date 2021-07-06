@@ -1,25 +1,23 @@
-import * as admin from "firebase-admin";
-import { Event } from "@polkadot/types/interfaces";
-
-export type InterestedEvent = { pattern: string, getPushData: (event: Event) => admin.messaging.TopicMessage };
+import { getPushEvents, PushEvent } from 'chain/pushEvents';
 
 export type ChainConfig = {
   ws: string;
-  events: readonly InterestedEvent[]
-}
+  pushEvents: PushEvent[];
+};
 
 const kusamaNetwork: ChainConfig = {
-  ws: "wss://kusama.api.onfinality.io/public-ws",
-  events: [],
-} as const
+  ws: 'wss://kusama.api.onfinality.io/public-ws',
+  pushEvents: getPushEvents({ networkKey: 'kusama' }),
+} as const;
 
 const polkadotNetwork: ChainConfig = {
-  ws: "wss://rpc.polkadot.io",
-  events: [],
-} as const
+  ws: 'wss://rpc.polkadot.io',
+  pushEvents: getPushEvents({ networkKey: 'polkadot' }),
+} as const;
 
 const litentryNetwork: ChainConfig = {
   // ws: 'wss://3.0.201.137',
+<<<<<<< HEAD
   ws: "wss://staging.registrar.litentry.io",
   events: [{
     pattern: "treasury.Proposed",
@@ -36,10 +34,14 @@ const litentryNetwork: ChainConfig = {
   }]
 }
 
+=======
+  ws: 'wss://staging.registrar.litentry.io',
+  pushEvents: getPushEvents({ networkKey: 'litentry_test' }),
+};
+>>>>>>> 188e76c (Move push events to their own file and address PR issue)
 
 export default {
   kusama: kusamaNetwork,
   polkadot: polkadotNetwork,
-  litentry_test: litentryNetwork
+  litentry_test: litentryNetwork,
 };
-
