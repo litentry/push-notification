@@ -1,0 +1,23 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Subscription {
+  id             Int       @default(autoincrement())  @id
+  deviceToken    String    @db.VarChar(255)           @map("device_token")
+  walletAddress  String    @map("wallet_address")
+  events         String[]
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@map(name: "subscriptions")
+  @@index([deviceToken, walletAddress])
+}
