@@ -12,7 +12,7 @@ generator client {
 
 model Subscription {
   id               Int              @default(autoincrement())  @id
-  deviceToken      String           @db.VarChar(255)           @map("device_token")
+  deviceToken      String           @db.VarChar(255)           @map("device_token")  @unique
   walletAddresses  WalletAddress[]
   events           String[]
   createdAt        DateTime         @default(now())
