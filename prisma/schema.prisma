@@ -11,13 +11,23 @@ generator client {
 }
 
 model Subscription {
-  id             Int       @default(autoincrement())  @id
-  deviceToken    String    @db.VarChar(255)           @map("device_token")
-  walletAddress  String    @map("wallet_address")
-  events         String[]
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
+  id               Int              @default(autoincrement())  @id
+  deviceToken      String           @db.VarChar(255)           @map("device_token")
+  walletAddresses  WalletAddress[]
+  events           String[]
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
 
   @@map(name: "subscriptions")
-  @@index([deviceToken, walletAddress])
+  @@index([deviceToken])
+}
+
+model WalletAddress {
+  id              Int           @default(autoincrement())  @id
+  address         String
+  subscription    Subscription  @relation(fields: [subscriptionId], references: [id])
+  subscriptionId  Int
+
+  @@map(name: "wallet_addresses")
+  @@index([address])
 }
