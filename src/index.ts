@@ -1,12 +1,10 @@
 import chalk from 'chalk';
 import cluster from 'cluster';
-// import express from 'express';
-// import bodyParser from 'body-parser';
+import express from 'express';
 
 import logger from './logger';
-// import config from './config';
 import chain from './chain';
-// import MyRouter from './router';
+import Api from './api';
 
 if (cluster.isMaster) {
   logger.debug(chalk.green(`Master process ${process.pid} is running ...`));
@@ -29,18 +27,17 @@ if (cluster.isMaster) {
   });
   // @ts-ignore
 } else if (cluster.worker.process.env.type == 'web_server_process') {
-  //   const app = express();
-  //
-  //   app.use(bodyParser.json());
-  //   app.use(bodyParser.urlencoded({ extended: false }));
-  //
-  //   app.use('/', MyRouter);
-  //
-  //   /* Listen on port */
-  //   app.listen(config.http.port);
-  //   /* Log some basic information */
-  //   logger.info(chalk.green(`Process ${process.pid} is listening on: ${config.http.port}`));
-  //   logger.info(chalk.green(`NODE_ENV: ${process.env.NODE_ENV}`));
+  const app = express();
+  app.use(express.json());
+  app.use(express.urlencoded({ extended: false }));
+  app.use('/api', Api);
+
+  /* Listen on port */
+  const httpPort = process.env.HTTP_PORT || 8080;
+  app.listen(httpPort);
+  /* Log some basic information */
+  logger.info(chalk.green(`Process ${process.pid} is listening on: ${httpPort}`));
+  logger.info(chalk.green(`NODE_ENV: ${process.env.NODE_ENV}`));
 
   (async () => {
     await chain.eventListenerAutoRestart().catch(console.error);
