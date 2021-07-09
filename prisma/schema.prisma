@@ -15,8 +15,8 @@ model Subscription {
   deviceToken      String           @db.VarChar(255)           @map("device_token")  @unique
   walletAddresses  WalletAddress[]
   events           String[]
-  createdAt        DateTime         @default(now())
-  updatedAt        DateTime         @updatedAt
+  createdAt        DateTime         @default(now())            @map("created_at")
+  updatedAt        DateTime         @updatedAt                 @map("updated_at")
 
   @@map(name: "subscriptions")
   @@index([deviceToken])
@@ -26,7 +26,7 @@ model WalletAddress {
   id              Int           @default(autoincrement())  @id
   address         String
   subscription    Subscription  @relation(fields: [subscriptionId], references: [id])
-  subscriptionId  Int
+  subscriptionId  Int           @map("subscription_id")
 
   @@map(name: "wallet_addresses")
   @@index([address])
