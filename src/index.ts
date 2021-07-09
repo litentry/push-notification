@@ -1,13 +1,11 @@
 import chalk from 'chalk';
 import cluster from 'cluster';
 // import express from 'express';
-// import { RequestContext } from '@mikro-orm/core';
 // import bodyParser from 'body-parser';
 
 import logger from './logger';
 // import config from './config';
 import chain from './chain';
-// import { DBHandler } from './db';
 // import MyRouter from './router';
 
 if (cluster.isMaster) {
@@ -35,7 +33,6 @@ if (cluster.isMaster) {
   //
   //   app.use(bodyParser.json());
   //   app.use(bodyParser.urlencoded({ extended: false }));
-  //   // app.use((req, res, next) => RequestContext.create(DBHandler.orm.em, next));
   //
   //   app.use('/', MyRouter);
   //
