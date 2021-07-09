@@ -1,9 +1,10 @@
-import { ApiPromise, WsProvider, Keyring } from "@polkadot/api";
-import { Vec } from "@polkadot/types";
-import { EventRecord } from "@polkadot/types/interfaces";
-import logger from "../logger";
-import pushNotification from "../notification";
-import config, { ChainConfig, InterestedEvent } from "./config";
+import { ApiPromise, Keyring, WsProvider } from '@polkadot/api';
+import { Vec } from '@polkadot/types';
+import { EventRecord } from '@polkadot/types/interfaces';
+import { PushEvent } from 'chain/pushEvents';
+import logger from '../logger';
+import pushNotification from '../notification';
+import config, { ChainConfig } from './config';
 
 /**
  * @name Chain
@@ -28,7 +29,7 @@ class Chain {
   /**
    * @description interested events of this chain
    */
-  private interestedEvents: ReadonlyArray<InterestedEvent>;
+  private interestedEvents: ReadonlyArray<PushEvent>;
 
   /**
    * @description the flag to indicate first connecting attemp
@@ -40,8 +41,8 @@ class Chain {
    */
   constructor(config: ChainConfig) {
     this.wsProvider = new WsProvider(config.ws);
-    this.interestedEvents = config.events;
-    this.keyring = new Keyring({ type: "sr25519" });
+    this.interestedEvents = config.pushEvents;
+    this.keyring = new Keyring({ type: 'sr25519' });
     this.unsubscribeEventListener = null;
     this.firstConnected = true;
   }
@@ -55,7 +56,7 @@ class Chain {
     const [chain, nodeName, nodeVersion] = await Promise.all([
       this.api.rpc.system.chain(),
       this.api.rpc.system.name(),
-      this.api.rpc.system.version()
+      this.api.rpc.system.version(),
     ]);
 
     logger.info(`You are connected to chain ${chain} using ${nodeName} v${nodeVersion}`);
@@ -68,12 +69,12 @@ class Chain {
    */
   async eventListenerStart() {
     if (this.unsubscribeEventListener) {
-      logger.debug("[EventListenerStart] Event listener is running now...");
+      logger.debug('[EventListenerStart] Event listener is running now...');
 
       return this.unsubscribeEventListener;
     }
 
-    logger.debug("[EventListenerStart] Starting event listener...");
+    logger.debug('[EventListenerStart] Starting event listener...');
 
     await this.connect();
 
@@ -88,13 +89,13 @@ class Chain {
         logger.debug(`Received event from chain: [${event.section}.${event.method}]`);
 
         for (let interestedEvent of this.interestedEvents) {
-          const [interestedSection, interestedMethod] = interestedEvent.pattern.split(".");
+          const [interestedSection, interestedMethod] = interestedEvent.pattern.split('.');
 
-          if (interestedSection === "*") {
+          if (interestedSection === '*') {
             logger.debug(`Process interestedSection: ${interestedSection}`);
             pushNotification(interestedEvent.getPushData(event));
             break;
-          } else if (interestedSection === event.section && interestedMethod === "*") {
+          } else if (interestedSection === event.section && interestedMethod === '*') {
             logger.debug(`Process interestedSection: ${interestedSection}.${interestedMethod}`);
             pushNotification(interestedEvent.getPushData(event));
             break;
@@ -116,7 +117,7 @@ class Chain {
    * @description Stop a event listener
    */
   async eventListenerStop() {
-    logger.debug("[EventListenerStop] Stopping event listener...");
+    logger.debug('[EventListenerStop] Stopping event listener...');
     if (this.unsubscribeEventListener) {
       (await this.unsubscribeEventListener)();
     }
@@ -127,7 +128,7 @@ class Chain {
    * @description Restart event listener
    */
   async eventListenerRestart() {
-    logger.debug("[EventListenerRestart] Restarting event listener...");
+    logger.debug('[EventListenerRestart] Restarting event listener...');
     await this.eventListenerStop();
     await this.eventListenerStart();
   }
