@@ -33,4 +33,18 @@ const treasuryProposedEvent: PushEvent = {
   },
 };
 
-export const pushEvents: PushEvent[] = [treasuryProposedEvent, newTipEvent];
+const democracyStartedEvent: PushEvent = {
+  pattern: 'democracy.Started',
+  getPushData() {
+    return {
+      topic: 'democracy.Started',
+      data: { deeplink: `litentry://api/${networkKey}/referenda` },
+      notification: {
+        title: 'Time to vote!',
+        body: 'A New Referendum has begun, check out the proposal!',
+      },
+    };
+  },
+};
+
+export const pushEvents: PushEvent[] = [treasuryProposedEvent, newTipEvent, democracyStartedEvent];

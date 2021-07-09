@@ -17,28 +17,9 @@ const polkadotNetwork: ChainConfig = {
 
 const litentryNetwork: ChainConfig = {
   // ws: 'wss://3.0.201.137',
-<<<<<<< HEAD
-  ws: "wss://staging.registrar.litentry.io",
-  events: [{
-    pattern: "treasury.Proposed",
-    getPushData() {
-      return {
-        topic: "treasury.Proposed",
-        data: { deeplink: "litentry://api/litentry_test/treasury" },
-        notification: {
-          title: `New Treasury Proposal`,
-          body: "A new treasury proposal has been submitted, check it out!"
-        }
-      };
-    }
-  }]
-}
-
-=======
   ws: 'wss://staging.registrar.litentry.io',
   pushEvents,
 };
->>>>>>> 188e76c (Move push events to their own file and address PR issue)
 
 export default {
   kusama: kusamaNetwork,
