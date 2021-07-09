@@ -1,4 +1,4 @@
-import { getPushEvents, PushEvent } from 'chain/pushEvents';
+import { pushEvents, PushEvent } from 'chain/pushEvents';
 
 export type ChainConfig = {
   ws: string;
@@ -7,18 +7,18 @@ export type ChainConfig = {
 
 const kusamaNetwork: ChainConfig = {
   ws: 'wss://kusama.api.onfinality.io/public-ws',
-  pushEvents: getPushEvents({ networkKey: 'kusama' }),
+  pushEvents,
 } as const;
 
 const polkadotNetwork: ChainConfig = {
   ws: 'wss://rpc.polkadot.io',
-  pushEvents: getPushEvents({ networkKey: 'polkadot' }),
+  pushEvents,
 } as const;
 
 const litentryNetwork: ChainConfig = {
   // ws: 'wss://3.0.201.137',
   ws: 'wss://staging.registrar.litentry.io',
-  pushEvents: getPushEvents({ networkKey: 'litentry_test' }),
+  pushEvents,
 };
 
 export default {
