@@ -33,5 +33,6 @@ jobs:
           $GIT_CRYPT_CMD unlock $GIT_CRYPT_KEY
           echo "NODE_ENV=$NODE_ENV" > .env
           echo "CHAIN_NETWORK=kusama" >> .env
+          pm2 stop index
           yarn
           yarn clean && yarn compile && yarn start
