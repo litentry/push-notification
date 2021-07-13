@@ -34,4 +34,4 @@ jobs:
           echo "NODE_ENV=$NODE_ENV" > .env
           echo "CHAIN_NETWORK=kusama" >> .env
           yarn
-          yarn clean && yarn build && yarn start
+          yarn clean && yarn compile && yarn start
