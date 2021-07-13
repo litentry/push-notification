@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 import chalk from 'chalk';
 import cluster from 'cluster';
 // import express from 'express';
@@ -7,7 +9,6 @@ import logger from './logger';
 // import config from './config';
 import chain from './chain';
 // import MyRouter from './router';
-require('dotenv').config();
 
 if (cluster.isMaster) {
   logger.debug(chalk.green(`Master process ${process.pid} is running ...`));
