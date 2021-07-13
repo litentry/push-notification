@@ -1,0 +1,38 @@
+# This is a basic workflow to help you get started with Actions
+
+name: kusama
+
+# Controls when the action will run.
+on:
+  # Triggers the workflow on push or pull request events but only for the master branch
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  deploy:
+    env:
+      GIT_CRYPT_CMD: /usr/bin/git-crypt
+      NODE_ENV: ${{ secrets.NODE_ENV }}
+      GIT_CRYPT_KEY: ${{ secrets.GIT_CRYPT_KEY }}
+    # The type of runner that the job will run on
+    runs-on: [self-hosted, kusama]
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+      # Runs a set of commands using the runners shell
+      - name: deploy
+        run: |
+          $GIT_CRYPT_CMD unlock $GIT_CRYPT_KEY
+          echo "NODE_ENV=$NODE_ENV" > .env
+          echo "CHAIN_NETWORK=kusama" >> .env
+          pm2 stop index
+          yarn
+          yarn clean && yarn compile && yarn start

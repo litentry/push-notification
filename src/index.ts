@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 import chalk from 'chalk';
 import cluster from 'cluster';
 // import express from 'express';
@@ -22,7 +24,7 @@ if (cluster.isMaster) {
 
     if (worker.id == webServerWorker.id) {
       logger.info(chalk.green('Restarting webServer worker ...'));
-      webServerWorker = cluster.fork({ type: 'web_server_process' });
+      webServerWorker = cluster.fork({ type: 'web_server_process', ...process.env });
     } else {
       logger.info(chalk.red(`Invalid worker ${worker.id} received`));
     }

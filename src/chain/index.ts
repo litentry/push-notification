@@ -1,7 +1,7 @@
 import { ApiPromise, Keyring, WsProvider } from '@polkadot/api';
 import { Vec } from '@polkadot/types';
 import { EventRecord } from '@polkadot/types/interfaces';
-import { PushEvent } from 'chain/pushEvents';
+import { PushEvent } from './pushEvents';
 import logger from '../logger';
 import pushNotification from '../notification';
 import config, { ChainConfig } from './config';

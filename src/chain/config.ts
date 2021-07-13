@@ -1,4 +1,4 @@
-import { pushEvents, PushEvent } from 'chain/pushEvents';
+import { pushEvents, PushEvent } from './pushEvents';
 
 export type ChainConfig = {
   ws: string;
