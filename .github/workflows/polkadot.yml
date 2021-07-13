@@ -19,9 +19,8 @@ jobs:
   deploy:
     env:
       GIT_CRYPT_CMD: /usr/bin/git-crypt
-      # NODE_ENV: staging
-      # GIT_CRYPT_KEY: /home/travis/litentry-registrar-git-crypt-key-default
-      # TARGET_DIR: /home/travis/litentry-registrar/litentry-registrar
+      NODE_ENV: ${{ secrets.NODE_ENV }}
+      GIT_CRYPT_KEY: ${{ secrets.GIT_CRYPT_KEY }}
     # The type of runner that the job will run on
     runs-on: [self-hosted, polkadot]
     # Steps represent a sequence of tasks that will be executed as part of the job
@@ -32,7 +31,7 @@ jobs:
       - name: deploy
         run: |
           $GIT_CRYPT_CMD unlock $GIT_CRYPT_KEY
-          echo NODE_ENV=$NODE_ENV > .env
-          echo NODE_ENV=$NODE_ENV >> .env
+          echo "NODE_ENV=$NODE_ENV" > .env
+          echo "CHAIN_NETWORK=polkadot" >> .env
           yarn
           yarn build && yarn start
