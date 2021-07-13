@@ -10,6 +10,7 @@
     "stop": "yarn pm2 stop dist/index.js",
     "clean": "rm -rf dist/*",
     "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "yarn compile",
     "start:dev": "yarn compile && yarn app",
     "start:staging": "yarn compile && yarn start",
     "stop:staging": "yarn compile && yarn stop"
