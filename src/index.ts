@@ -7,6 +7,7 @@ import logger from './logger';
 // import config from './config';
 import chain from './chain';
 // import MyRouter from './router';
+require('dotenv').config();
 
 if (cluster.isMaster) {
   logger.debug(chalk.green(`Master process ${process.pid} is running ...`));
@@ -22,7 +23,7 @@ if (cluster.isMaster) {
 
     if (worker.id == webServerWorker.id) {
       logger.info(chalk.green('Restarting webServer worker ...'));
-      webServerWorker = cluster.fork({ type: 'web_server_process' });
+      webServerWorker = cluster.fork({ type: 'web_server_process', ...process.env });
     } else {
       logger.info(chalk.red(`Invalid worker ${worker.id} received`));
     }
