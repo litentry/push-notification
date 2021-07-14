@@ -6,10 +6,10 @@ export type PushEvent = { pattern: string; getPushData: (event: Event) => admin.
 const networkKey = process.env.CHAIN_NETWORK;
 
 const newTipEvent: PushEvent = {
-  pattern: 'tips.newTip',
+  pattern: 'tips.NewTip',
   getPushData() {
     return {
-      topic: 'tips.newTip',
+      topic: 'tips.NewTip',
       data: { deeplink: `litentry://api/${networkKey}/tips` },
       notification: {
         title: 'Tip Suggestion',
@@ -33,4 +33,18 @@ const treasuryProposedEvent: PushEvent = {
   },
 };
 
-export const pushEvents: PushEvent[] = [treasuryProposedEvent, newTipEvent];
+const democracyStartedEvent: PushEvent = {
+  pattern: 'democracy.Started',
+  getPushData() {
+    return {
+      topic: 'democracy.Started',
+      data: { deeplink: `litentry://api/${networkKey}/referenda` },
+      notification: {
+        title: 'Time to vote!',
+        body: 'A New Referendum has begun, check out the proposal!',
+      },
+    };
+  },
+};
+
+export const pushEvents: PushEvent[] = [treasuryProposedEvent, newTipEvent, democracyStartedEvent];
