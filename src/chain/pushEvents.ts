@@ -6,10 +6,10 @@ export type PushEvent = { pattern: string; getPushData: (event: Event) => admin.
 const networkKey = process.env.CHAIN_NETWORK;
 
 const newTipEvent: PushEvent = {
-  pattern: 'tips.newTip',
+  pattern: 'tips.NewTip',
   getPushData() {
     return {
-      topic: 'tips.newTip',
+      topic: 'tips.NewTip',
       data: { deeplink: `litentry://api/${networkKey}/tips` },
       notification: {
         title: 'Tip Suggestion',
