@@ -1,4 +1,5 @@
-import { ApiPromise, Keyring, WsProvider } from '@polkadot/api';
+import '@polkadot/api-augment';
+import { ApiPromise, WsProvider } from '@polkadot/api';
 import { Vec } from '@polkadot/types';
 import { EventRecord } from '@polkadot/types/interfaces';
 import { PushEvent } from './pushEvents';
@@ -16,10 +17,6 @@ class Chain {
    */
   private wsProvider: WsProvider;
   /**
-   * @description keyring of user accounts
-   */
-  private keyring: Keyring;
-  /**
    * @description API interfaces of `Chain`
    */
   private api: ApiPromise;
@@ -32,19 +29,12 @@ class Chain {
   private interestedEvents: ReadonlyArray<PushEvent>;
 
   /**
-   * @description the flag to indicate first connecting attemp
-   */
-  private firstConnected: boolean;
-
-  /**
    * @description constructor of Chain
    */
   constructor(config: ChainConfig) {
     this.wsProvider = new WsProvider(config.ws);
     this.interestedEvents = config.pushEvents;
-    this.keyring = new Keyring({ type: 'sr25519' });
     this.unsubscribeEventListener = null;
-    this.firstConnected = true;
   }
 
   /**
