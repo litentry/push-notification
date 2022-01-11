@@ -12,7 +12,7 @@ const newTipEvent: PushEvent = {
       topic: 'tips.NewTip',
       data: { deeplink: `litentry://api/${networkKey}/tips` },
       notification: {
-        title: 'Tip Suggestion',
+        title: `Tip Suggestion on ${networkKey}`,
         body: 'A new tip has been suggested, check it out!',
       },
     };
@@ -26,7 +26,7 @@ const treasuryProposedEvent: PushEvent = {
       topic: 'treasury.Proposed',
       data: { deeplink: `litentry://api/${networkKey}/treasury` },
       notification: {
-        title: `New Treasury Proposal`,
+        title: `New Treasury Proposal on ${networkKey}`,
         body: 'A new treasury proposal has been submitted, check it out!',
       },
     };
@@ -40,7 +40,7 @@ const democracyStartedEvent: PushEvent = {
       topic: 'democracy.Started',
       data: { deeplink: `litentry://api/${networkKey}/referenda` },
       notification: {
-        title: 'Time to vote!',
+        title: `New Referendum on ${networkKey}`,
         body: 'A New Referendum has begun, check out the proposal!',
       },
     };
